@@ -1,16 +1,17 @@
 FROM ubuntu:24.04
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 
-RUN apt-get update \
-	&& apt-get dist-upgrade -y \
-	&& apt-get install -y apache2 \
+# hadolint ignore=DL3008
+RUN export DEBIAN_FRONTEND=noninteractive \
+	&& apt-get update \
+	&& apt-get upgrade -y \
+	&& apt-get install -y --no-install-recommends apache2 \
 	&& apt-get autoclean \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-ADD entrypoint.sh /usr/local/bin/docker-httpd-entrypoint
+COPY entrypoint.sh /usr/local/bin/docker-httpd-entrypoint
 RUN chmod +x /usr/local/bin/docker-httpd-entrypoint
 
 # Create symlinks to write error and access log to stdout / stderr
